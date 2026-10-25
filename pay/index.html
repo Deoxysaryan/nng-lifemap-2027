@@ -78,6 +78,7 @@ input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,
 .who .tg{font-family:var(--serif);font-size:11px;letter-spacing:.16em;color:#F7B9C8;text-transform:uppercase}
 @media (max-width:360px){.hero{grid-template-columns:104px 1fr}.hero img{width:104px;height:170px}h1{font-size:28px}}
 @media (prefers-reduced-motion:no-preference){.card{animation:in .35s ease-out both}@keyframes in{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}}
+.imp{background:#FFF4D6;border:2px solid var(--gold);border-radius:12px;padding:10px 12px;margin:0 0 14px;font-size:14px;line-height:1.45;color:var(--ink)}.imp b{color:#8A1230}
 </style>
 </head>
 <body data-page="lifemap-2027">
@@ -108,21 +109,22 @@ input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,
 
     <div id="step2" hidden>
       <h2>Rs 11,000 pay kijiye</h2>
-      <p class="sub"><span id="hi"></span> Phone par button dabaiye, ya kisi bhi UPI app se QR scan kijiye. Amount pehle se bhara hoga.</p>
-      <a class="btn" id="paylink" href="upi://pay?pa=MSTRANSFORMATIONWITHNNG.eazypay@icici&amp;pn=M%2FS.TRANSFORMATION%20WITH%20NNG&amp;tr=EZYS9711061061&amp;am=11000.00&amp;cu=INR&amp;mc=NULL&amp;tn=Life%20Map%202027">UPI app se Rs 11,000 pay kijiye <span aria-hidden="true">→</span></a>
+      <p class="sub" id="hi">Phone par button dabaiye, ya kisi bhi UPI app se QR scan kijiye. Amount pehle se bhara hoga.</p>
+      <p class="imp"><b>Zaroori:</b> Payment ke baad isi page par wapas aaiye aur neeche <b>"Maine pay kar diya"</b> button zaroor dabaiye. Tabhi aapki booking confirm hogi.</p>
+      <a class="btn" id="paylink" href="upi://pay?pa=MSTRANSFORMATIONWITHNNG.eazypay@icici&amp;pn=M%2FS.TRANSFORMATION%20WITH%20NNG&amp;tr=EZYS9711061061&amp;am=11000.00&amp;cu=INR&amp;mc=NULL&amp;tn=Life%20Map%202027">UPI app se pay kijiye <span aria-hidden="true">→</span></a>
       <img class="qr" src="../assets/upi-11000.png" alt="UPI QR code for Rs 11,000 to M/S. Transformation with NNG" width="320" height="400" style="width:min(300px,80%)">
       <div class="upi"><code id="upiid">MSTRANSFORMATIONWITHNNG.eazypay@icici</code><button class="copy" id="copy" type="button">Copy</button></div>
       <form id="step3" novalidate class="after">
         <h3>Payment ho gaya?</h3>
-        <p>Bas neeche button dabaiye. Aapki booking record ho jaayegi.</p>
+        <p>Ab yeh button zaroor dabaiye. Iske bina booking confirm nahi hogi.</p>
         <button class="btn dark" id="done" type="submit">Maine pay kar diya <span aria-hidden="true">✓</span></button>
       </form>
     </div>
 
     <div id="step4" hidden>
-      <h2>Dhanyavaad <span id="nm2"></span> 🙏</h2>
+      <h2 id="ty">Dhanyavaad 🙏</h2>
       <p class="sub">Aapki booking record ho gayi hai. Payment verify hote hi Narayani ji ki team aapse sampark karegi.</p>
-      <p class="note">Booking ID: <b id="ref2"></b></p>
+      <p class="note" id="ref2"></p>
     </div>
   </section>
 
@@ -163,7 +165,7 @@ input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,
     const pl = document.getElementById('paylink');
     pl.href = pl.href.replace(/tn=[^&]*/, 'tn=' + encodeURIComponent(ref + ' ' + nm + ' Life Map 2027'));
     send('Details bhare, payment pending');
-    document.getElementById('hi').textContent = 'Dhanyavaad ' + who.name.split(' ')[0] + '.';
+    document.getElementById('hi').textContent = 'Dhanyavaad ' + who.name.split(' ')[0] + '. Phone par button dabaiye, ya kisi bhi UPI app se QR scan kijiye. Amount pehle se bhara hoga.';
     f.hidden = true; document.getElementById('step2').hidden = false;
     document.getElementById('s1').className = 'done'; document.getElementById('s2').className = 'on';
     document.getElementById('card').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -173,8 +175,8 @@ input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,
     e.preventDefault();
     const btn = document.getElementById('done'); btn.disabled = true; btn.textContent = 'Record ho raha hai...';
     await send('Payment made Rs 11,000 (client confirmed, verify in statement)');
-    document.getElementById('nm2').textContent = who.name.split(' ')[0];
-    document.getElementById('ref2').textContent = ref;
+    document.getElementById('ty').textContent = 'Dhanyavaad ' + who.name.split(' ')[0] + ' 🙏';
+    document.getElementById('ref2').textContent = 'Booking ID: ' + ref;
     document.getElementById('step2').hidden = true; document.getElementById('step4').hidden = false;
     document.getElementById('s2').className = 'done';
     document.getElementById('card').scrollIntoView({ behavior: 'smooth', block: 'start' });
