@@ -114,15 +114,15 @@ input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,
       <div class="upi"><code id="upiid">MSTRANSFORMATIONWITHNNG.eazypay@icici</code><button class="copy" id="copy" type="button">Copy</button></div>
       <form id="step3" novalidate class="after">
         <h3>Payment ho gaya?</h3>
-        <p>UPI app mein dikh raha UTR / Transaction ID (12 ankon ka number) yahan likhiye aur confirm kijiye.</p>
-        <div class="f" id="f-utr"><label for="utr">UTR / Transaction ID</label><input id="utr" name="utr" inputmode="numeric" autocomplete="off" placeholder="Jaise: 4321 5678 9012" required><span class="e"></span></div>
-        <button class="btn dark" id="done" type="submit">Payment confirm kijiye</button>
+        <p>Bas neeche button dabaiye. Aapki booking record ho jaayegi.</p>
+        <button class="btn dark" id="done" type="submit">Maine pay kar diya <span aria-hidden="true">✓</span></button>
       </form>
     </div>
 
     <div id="step4" hidden>
       <h2>Dhanyavaad <span id="nm2"></span> 🙏</h2>
-      <p class="sub">Aapki booking aur Rs 11,000 ki payment record ho gayi hai. Payment verify hote hi Narayani ji ki team aapse sampark karegi.</p>
+      <p class="sub">Aapki booking record ho gayi hai. Payment verify hote hi Narayani ji ki team aapse sampark karegi.</p>
+      <p class="note">Booking ID: <b id="ref2"></b></p>
     </div>
   </section>
 
@@ -142,13 +142,27 @@ input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,
     dob: v => !v ? 'Apni janam tithi chuniye.' : (v < '1920-01-01' || v > today) ? 'Sahi janam tithi chuniye.' : ''
   };
   const setErr = (n, m) => { const box = document.getElementById('f-' + n); box.classList.toggle('err', !!m); box.querySelector('.e').textContent = m; };
-  let who = null;
+  let who = null, ref = '';
+  const send = status => {
+    const [y, m, d] = who.dob.split('-');
+    const body = new URLSearchParams({
+      'entry.1846394901': who.name, 'entry.1754973381': who.email,
+      'entry.2096303252_year': y, 'entry.2096303252_month': String(+m), 'entry.2096303252_day': String(+d),
+      'entry.1942994939': status + ' | Booking ID ' + ref, 'pageHistory': '0,1'
+    });
+    return fetch(FORM, { method: 'POST', mode: 'no-cors', body, keepalive: true }).catch(() => {});
+  };
   f.addEventListener('submit', e => {
     e.preventDefault();
     let first = null;
     Object.keys(rules).forEach(n => { const m = rules[n](el[n].value); setErr(n, m); if (m && !first) first = el[n]; });
     if (first) { first.focus(); return; }
     who = { name: el.name.value.trim().replace(/\s+/g, ' '), email: el.email.value.trim(), dob: el.dob.value };
+    ref = 'LM' + String(Math.floor(1000 + Math.random() * 9000));
+    const nm = who.name.replace(/[^A-Za-z ]/g, '').slice(0, 30).trim();
+    const pl = document.getElementById('paylink');
+    pl.href = pl.href.replace(/tn=[^&]*/, 'tn=' + encodeURIComponent(ref + ' ' + nm + ' Life Map 2027'));
+    send('Details bhare, payment pending');
     document.getElementById('hi').textContent = 'Dhanyavaad ' + who.name.split(' ')[0] + '.';
     f.hidden = true; document.getElementById('step2').hidden = false;
     document.getElementById('s1').className = 'done'; document.getElementById('s2').className = 'on';
@@ -157,18 +171,10 @@ input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,
   const g = document.getElementById('step3');
   g.addEventListener('submit', async e => {
     e.preventDefault();
-    const utr = g.elements.utr.value.replace(/\s+/g, '');
-    if (!/^[A-Za-z0-9]{8,30}$/.test(utr)) { setErr('utr', 'Sahi UTR / Transaction ID likhiye.'); g.elements.utr.focus(); return; }
-    setErr('utr', '');
-    const [y, m, d] = who.dob.split('-');
-    const body = new URLSearchParams({
-      'entry.1846394901': who.name, 'entry.1754973381': who.email,
-      'entry.2096303252_year': y, 'entry.2096303252_month': String(+m), 'entry.2096303252_day': String(+d),
-      'entry.1942994939': 'Paid Rs 11,000 | UTR ' + utr, 'pageHistory': '0,1'
-    });
     const btn = document.getElementById('done'); btn.disabled = true; btn.textContent = 'Record ho raha hai...';
-    try { await fetch(FORM, { method: 'POST', mode: 'no-cors', body }); } catch (err) {}
+    await send('Payment made Rs 11,000 (client confirmed, verify in statement)');
     document.getElementById('nm2').textContent = who.name.split(' ')[0];
+    document.getElementById('ref2').textContent = ref;
     document.getElementById('step2').hidden = true; document.getElementById('step4').hidden = false;
     document.getElementById('s2').className = 'done';
     document.getElementById('card').scrollIntoView({ behavior: 'smooth', block: 'start' });
