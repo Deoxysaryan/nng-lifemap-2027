@@ -72,6 +72,7 @@ input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,
 .after h3{margin:0 0 6px;font-size:15px}
 .after p{margin:0 0 12px;font-size:14px;color:var(--muted);line-height:1.5}
 .num{font-weight:600;color:var(--ink);user-select:all}
+.resend{margin:-6px 0 14px;font-size:13.5px;text-align:center;color:var(--muted)}.resend a{color:var(--ink);font-weight:600}
 .who{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center}
 .who .nm{font-family:var(--serif);font-size:20px;color:var(--gold-hi)}
 .who .tg{font-family:var(--serif);font-size:11px;letter-spacing:.16em;color:#F7B9C8;text-transform:uppercase}
@@ -104,13 +105,14 @@ input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,
       <div class="f" id="f-email"><label for="email">Email ID</label><input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="aapka@email.com" required><span class="e"></span></div>
       <div class="f" id="f-dob"><label for="dob">Janam tithi (Date of birth)</label><input id="dob" name="dob" type="date" min="1920-01-01" required><span class="e"></span></div>
       <div class="hp" aria-hidden="true"><label for="website">Website</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
-      <button class="btn" id="go" type="submit">Aage badhiye: Payment <span aria-hidden="true">→</span></button>
-      <p class="note">Aapki details sirf Narayani ji ki team ke paas jaayengi.</p>
+      <button class="btn" id="go" type="submit">Details WhatsApp par bhejiye <span aria-hidden="true">→</span></button>
+      <p class="note">Button dabaate hi WhatsApp khulega. Message bhej dijiye, phir payment ka step aayega. Aapki details sirf Narayani ji ki team ke paas jaayengi.</p>
     </form>
 
     <div id="step2" hidden>
       <h2>Payment kijiye</h2>
       <p class="sub"><span id="hi"></span> Jo amount aapko message mein bataya gaya hai, wahi UPI se pay kijiye.</p>
+      <p class="resend">WhatsApp nahi khula? <a id="wa1" href="https://wa.me/919205511101" target="_blank" rel="noopener">Details yahan se bhejiye</a></p>
       <img class="qr" src="assets/upi-qr.png" alt="UPI QR code for M/S. Transformation with NNG" width="240" height="240">
       <p class="payee">M/S. Transformation with NNG</p>
       <div class="upi"><code id="upiid">MSTRANSFORMATIONWITHNNG.eazypay@icici</code><button class="copy" id="copy" type="button">Copy</button></div>
@@ -118,7 +120,7 @@ input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,
       <p class="note">Phone par button dabaiye ya kisi bhi UPI app (GPay, PhonePe, Paytm, BHIM) se QR scan kijiye.</p>
       <div class="after">
         <h3>Payment ke baad</h3>
-        <p>Payment ka screenshot WhatsApp par bhejiye: <span class="num">+91 92055 11101</span>. Aapka Life Map confirm hote hi team aapse sampark karegi.</p>
+        <p>Payment ka screenshot isi WhatsApp number par bhejiye: <span class="num">+91 92055 11101</span>. Aapka Life Map confirm hote hi team aapse sampark karegi.</p>
         <a class="btn dark" id="wa" href="https://wa.me/919205511101" target="_blank" rel="noopener">Screenshot WhatsApp kijiye</a>
       </div>
     </div>
@@ -168,14 +170,13 @@ input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,
       dob: dob, website: el.website.value,
       url: location.href.split('#')[0], referrer: document.referrer, ...utm
     };
-    const btn = document.getElementById('go');
-    btn.disabled = true;
-    try {
-      await fetch(ENDPOINT, { method: 'POST', body: JSON.stringify(data), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
-    } catch (err) { /* payment still shown; screenshot on WhatsApp carries the details */ }
-    btn.disabled = false;
+    const details = 'Namaste, mujhe Life Map 2027 chahiye.\nNaam: ' + name + '\nEmail: ' + data.email + '\nJanam tithi: ' + dob;
+    const waDetails = 'https://wa.me/919205511101?text=' + encodeURIComponent(details);
+    window.open(waDetails, '_blank', 'noopener');
+    document.getElementById('wa1').href = waDetails;
+    fetch(ENDPOINT, { method: 'POST', body: JSON.stringify(data), headers: { 'Content-Type': 'text/plain;charset=utf-8' } }).catch(() => {});
     document.getElementById('hi').textContent = 'Dhanyavaad ' + parts[0] + '.';
-    const msg = 'Namaste, maine Life Map 2027 ke liye payment kar diya hai.\nNaam: ' + name + '\nEmail: ' + data.email + '\nJanam tithi: ' + dob;
+    const msg = 'Namaste, maine Life Map 2027 ke liye payment kar diya hai. Screenshot saath mein hai.\nNaam: ' + name;
     document.getElementById('wa').href = 'https://wa.me/919205511101?text=' + encodeURIComponent(msg);
     f.hidden = true;
     document.getElementById('step2').hidden = false;
